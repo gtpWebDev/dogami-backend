@@ -4,13 +4,17 @@ const router = express.Router();
 // this acts as a conduit for all the routes to reduce routes in app.js to one line
 
 const userRouter = require("./userRoutes");
+const dogamiRouter = require("./dogamiRoutes");
+const trackRouter = require("./trackRoutes");
+// const dogamiImgRouter = require("./dogamiImgRoutes"); // one-off comment out
 
 router.use("/user", userRouter);
+router.use("/dogami", dogamiRouter);
+router.use("/track", trackRouter);
+// router.use("/dogami-img", dogamiImgRouter); // one-off comment out
 
-/* GET home page. */
-router.get("/", function (req, res, next) {
-  // render the "index" view, with the given parameters
-  res.render("index", { title: "Account Home Page" });
+router.get("/", async (req, res, next) => {
+  res.status(200).json({ msg: "test - backend service live" });
 });
 
 module.exports = router;

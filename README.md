@@ -119,13 +119,13 @@ npm install dotenv
 
 Create **.env** and add the following environment variables:
 
-```js
-PORT = 3000;
-NODE_ENV = "production";
-DB_STRING_DEV = "";
-DB_STRING_PROD = "";
-RSA_PUBLIC_KEY = "";
-RSA_PRIVATE_KEY = "";
+```bash
+PORT = 3000
+NODE_ENV = "production"
+DB_STRING_DEV = ""
+DB_STRING_PROD = ""
+RSA_PUBLIC_KEY = ""
+RSA_PRIVATE_KEY = ""
 ```
 
 The db strings should be the following format:

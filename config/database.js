@@ -7,7 +7,7 @@ require("dotenv").config();
  *
  * Connect to MongoDB Server using the connection strings in the `.env` file.  To implement this, place the following
  *
- * This is exposed in app.js, providing a global connection in any module using mongoose.conection
+ * This is exposed in app.js, providing a global connection in any module using mongoose.connection
  *
  */
 

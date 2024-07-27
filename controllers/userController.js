@@ -1,31 +1,14 @@
 const passport = require("passport");
 const User = require("../models/userModel");
+// required for populate
+const Dogami = require("../models/dogamiModel");
 
 const { body, validationResult } = require("express-validator");
-
-const authMiddleware = require("../lib/authMiddleware");
 
 const passwordUtils = require("../lib/passwordUtils");
 
 // short form, applying try {} catch(err)
 const asyncHandler = require("express-async-handler");
-
-// Display home page
-exports.index = asyncHandler(async (req, res, next) => {
-  // render the "index" view, with the given parameters
-  res.render("index", { title: "Home Page" });
-});
-
-// display register page
-// exports.register_get = asyncHandler(async (req, res, next) => {
-//   const form =
-//     '<h1>Register Page</h1><form method="post" action="/user/register">\
-//                   Enter Username:<br><input type="text" name="username">\
-//                   <br>Enter Password:<br><input type="password" name="password">\
-//                   <br><br><input type="submit" value="Submit"></form>';
-
-//   res.send(form);
-// });
 
 // user attempts to register
 exports.register_post = [
@@ -58,45 +41,50 @@ exports.register_post = [
     } else {
       // Data from form is valid.
 
-      // apply the local strategy to generate a salt and password hash from the password
-      const saltAndHash = passwordUtils.generatePassword(req.body.password);
-      const salt = saltAndHash.salt;
-      const passwordHash = saltAndHash.passwordHash;
-
-      const newUser = new User({
+      // Check if Condition with same name already exists.
+      const userExists = await User.findOne({
         username: req.body.username,
-        hash: passwordHash,
-        salt: salt,
-        admin: false,
-      });
+      })
+        .collation({ locale: "en", strength: 2 }) // basically case insensitive
+        .exec();
 
-      // add the new user to the database
-      newUser.save().then((user) => {
-        // issue a JWT and return it
-        const jwt = passwordUtils.issueJWT(user);
-
-        // console.log("token", jwt.token);
-
-        res.status(200).json({
-          success: true,
-          user: user,
-          token: jwt.token,
-          expiresIn: jwt.expires,
+      if (userExists) {
+        res.status(400).json({
+          success: false,
+          msg: "Username already exists. Please use another.",
         });
-      });
+      } else {
+        // apply the local strategy to generate a salt and password hash from the password
+        const saltAndHash = passwordUtils.generatePassword(req.body.password);
+        const salt = saltAndHash.salt;
+        const passwordHash = saltAndHash.passwordHash;
+
+        const newUser = new User({
+          username: req.body.username,
+          hash: passwordHash,
+          salt: salt,
+          admin: false,
+          owned_dogs: [],
+        });
+
+        // add the new user to the database
+        newUser.save().then((user) => {
+          // issue a JWT and return it
+          const jwt = passwordUtils.issueJWT(user);
+
+          // console.log("token", jwt.token);
+
+          res.status(200).json({
+            success: true,
+            user: user,
+            token: jwt.token,
+            expiresIn: jwt.expires,
+          });
+        });
+      }
     }
   }),
 ];
-
-// user requests login page
-// exports.login_get = asyncHandler(async (req, res, next) => {
-//   const form =
-//     '<h1>Login Page</h1><form method="POST" action="/user/login">\
-//   Enter Username:<br><input type="text" name="username">\
-//   <br>Enter Password:<br><input type="password" name="password">\
-//   <br><br><input type="submit" value="Submit"></form>';
-//   res.send(form);
-// });
 
 // user attempts to login
 exports.login_post = asyncHandler(
@@ -141,10 +129,13 @@ exports.login_post = asyncHandler(
 // request for dashboard page
 exports.dashboard_get = [
   // passport middleware applies verifyCallback
-  passport.authenticate("jwt", { session: false }),
-  // emits user in response
+  passport.authenticate("jwt", { session: false }), // emits user in response
+
   asyncHandler(async (req, res, next) => {
-    User.findOne({ _id: req.user._id })
+    // need to collect both the user and their owned dogs
+
+    User.findById(req.user._id)
+      .populate("owned_dogs")
       .then((user) => {
         if (!user) {
           console.log("Could not find user:");
@@ -152,8 +143,7 @@ exports.dashboard_get = [
             .status(401)
             .json({ success: false, msg: "could not find user" });
         }
-
-        console.log("User details of logged in profile from database", user);
+        // console.log("User details of logged in profile from database", user);
         res.status(200).json({ success: true, data: user });
       })
       .catch((err) => {
@@ -161,37 +151,3 @@ exports.dashboard_get = [
       });
   }),
 ];
-
-// exports.protected_get = [
-//   // passport middleware applies verifyCallback
-//   passport.authenticate("jwt", { session: false }),
-//   asyncHandler((req, res, next) => {
-//     res.status(200).json({
-//       success: true,
-//       msg: "You are successfully authorized to this route!",
-//     });
-//   }),
-// ];
-
-// exports.admin_get = [
-//   // passport middleware applies verifyCallback
-//   passport.authenticate("jwt", { session: false }),
-//   authMiddleware.isAdmin,
-//   asyncHandler((req, res, next) => {
-//     res.status(200).json({
-//       success: true,
-//       msg: "You are successfully authorized to this admin route!",
-//     });
-//   }),
-// ];
-
-// Logout is meaningless in the context of JWT as the session authorization and expiry is held with the client
-// However, it may be helpful to have a process for blacklisting a token.
-// exports.logout_get = asyncHandler(async (req, res, next) => {
-//   req.logout(function (err) {
-//     if (err) {
-//       return next(err);
-//     }
-//     res.redirect("/user/login");
-//   });
-// });

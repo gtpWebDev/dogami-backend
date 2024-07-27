@@ -7,6 +7,14 @@ var passport = require("passport");
 
 var indexRouter = require("./routes/indexRoutes");
 
+/**
+ * TO DO:
+ * - dogami_controller.dogami_detail:
+ *   - collecting track strats, look at optimising:
+ *     - add an index for the query
+ *     - possible to group by track and get details for minimum time?
+ */
+
 // manage use of environment variables in the .env file
 require("dotenv").config();
 

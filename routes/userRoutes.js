@@ -3,37 +3,28 @@ var router = express.Router();
 
 const user_controller = require("../controllers/userController");
 
-// creates and a modular, mountable route handler
+/**
+ *  Given the purpose of the application, and user containing
+ *  authentication information, all user requests go through
+ *  JWT authentication and use the id in the JWT.
+ *
+ *  It would be possible to provide general user/:userId routes,
+ *  but I have chosen not to currently.
+ *
+ *  Users can make things such as their strats private.
+ */
 
-/* GET home page. */
-router.get("/", user_controller.index);
-
-/* GET register page - get the template for registering. */
-// disabled but works
-// router.get("/register", user_controller.register_get);
+/* --- PAGE ROUTES--- */
+// Can generally put these first, as they are fully-specific
 
 /* POST register page - user attempts to register. */
 router.post("/register", user_controller.register_post);
 
-/* GET login page - get the template for logging in. */
-// disabled but works
-// router.get("/login", user_controller.login_get);
-
 /* POST login page - user attempts to login. */
 router.post("/login", user_controller.login_post);
 
-/* GET protected page to test authorization works */
-// no longer relevant
-// router.get("/protected", user_controller.protected_get);
+// GET request tailored to the needs of the frontend user dashboard
+router.get("/frontend-user-dashboard", user_controller.dashboard_get);
 
-/* GET protected page to test authorization works */
-// disabled but works
-// router.get("/admin", user_controller.admin_get);
-
-// GET user dashboard
-router.get("/dashboard", user_controller.dashboard_get);
-
-// POST logout page - user attempts to logout
-// router.get("/logout", user_controller.logout_get);
-
+// creates and a modular, mountable route handler
 module.exports = router;
