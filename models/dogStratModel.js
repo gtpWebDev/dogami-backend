@@ -2,17 +2,17 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const TrackStratSchema = new Schema(
+const DogStratSchema = new Schema(
   {
     is_private: { type: Boolean, required: true }, // whether user wants the information shared
     dogami_id: { type: Schema.Types.ObjectId, ref: "Dogami" },
     track_id: { type: Schema.Types.ObjectId, ref: "Track" },
-    power_1: { type: String, maxLength: 10 }, // placeholder, will be a power objectId
-    power_2: { type: String, maxLength: 10 }, // placeholder, will be a power objectId
-    consumable_1: { type: String, maxLength: 10 }, // placeholder, will be a consumable objectId
+    power_1: { type: Schema.Types.ObjectId, ref: "Power" },
+    power_2: { type: Schema.Types.ObjectId, ref: "Power" },
+    consumable_1: { type: Schema.Types.ObjectId, ref: "Consumable" },
     strat_best_time: { type: Number, required: true }, // best time for this specific strat
   },
-  { collection: "track_strats" }
+  { collection: "dog_strats" }
 );
 
 // Virtual for track strat URL - may be needed?
@@ -20,4 +20,4 @@ const TrackStratSchema = new Schema(
 //   return `/track/${this._id}`;
 // });
 
-module.exports = mongoose.connection.model("TrackStrat", TrackStratSchema);
+module.exports = mongoose.connection.model("DogStrat", DogStratSchema);

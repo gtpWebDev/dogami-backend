@@ -5,11 +5,16 @@ const mongoose = require("mongoose");
 
 const User = require("../models/userModel");
 const Dogami = require("../models/dogamiModel");
-const TrackStrat = require("../models/trackStratModel");
+const DogStrat = require("../models/dogStratModel");
 const Track = require("../models/trackModel");
 const DogamiImage = require("../models/dogamiImgModel");
+const Power = require("../models/powerModel");
+const Consumable = require("../models/consumableModel");
 
 const authMiddleware = require("../lib/authMiddleware");
+
+const addDogamiMiddleware = require("../lib/addDogamiMiddleware");
+
 const dogInfo = require("../constants/dogInformation");
 const tidyErrorArray =
   require("../lib/requestValidation").constructValidationErrorMessage;
@@ -55,9 +60,12 @@ exports.dogami_strats = [
   authMiddleware.ownDogami,
 
   asyncHandler(async (req, res, next) => {
-    TrackStrat.find({ dogami_id: req.params.dogamiId })
+    DogStrat.find({ dogami_id: req.params.dogamiId })
       .populate("track_id")
       .populate("dogami_id")
+      .populate("power_1")
+      .populate("power_2")
+      .populate("consumable_1")
       .then((strategy) => {
         if (!strategy) {
           return res.status(401).json({
@@ -88,10 +96,10 @@ exports.dogami_page_get = [
 
   // Collect and return the dogami and track strat information
   asyncHandler(async (req, res, next) => {
-    const [dogami, allTrackStratsForDogami] = await Promise.all([
+    const [dogami, allDogStratsForDogami] = await Promise.all([
       Dogami.findById(req.params.dogamiId).exec(),
       // may be possible optimise by querying the minimum time for each track
-      TrackStrat.find({ dogami_id: req.params.dogamiId })
+      DogStrat.find({ dogami_id: req.params.dogamiId })
         .populate("track_id")
         .exec(),
     ]);
@@ -100,7 +108,7 @@ exports.dogami_page_get = [
       success: true,
       data: {
         dogami: dogami,
-        trackStrats: allTrackStratsForDogami,
+        dogStrats: allDogStratsForDogami,
       },
     };
 
@@ -123,7 +131,7 @@ exports.dogami_track_page_get = [
     const [dogami, track, stratsForDogamiTrack] = await Promise.all([
       Dogami.findById(req.params.dogamiId).exec(),
       Track.findById(req.params.trackId).exec(),
-      TrackStrat.find({
+      DogStrat.find({
         dogami_id: req.params.dogamiId,
         track_id: req.params.trackId,
       }).exec(),
@@ -141,7 +149,7 @@ exports.dogami_track_page_get = [
       data: {
         dogami: dogami,
         track: track,
-        dogamiTrackStrats: stratsForDogamiTrack,
+        dogamiDogStrats: stratsForDogamiTrack,
       },
     };
 
@@ -173,12 +181,15 @@ exports.dogami_strat_list = [
       const errorMsg = tidyErrorArray(validationObject);
       res.status(400).json({ success: false, msg: errorMsg });
     } else {
-      TrackStrat.find({
+      DogStrat.find({
         dogami_id: req.params.dogamiId,
         track_id: req.query.track_id,
       })
         .populate("dogami_id")
         .populate("track_id")
+        .populate("power_1")
+        .populate("power_2")
+        .populate("consumable_1")
         .then((strategy) => {
           if (!strategy) {
             return res.status(401).json({
@@ -205,6 +216,7 @@ exports.dogami_create_post = [
   body("dogami_official_id", "Official dogami id must be a number")
     .isNumeric()
     .escape(),
+  body("level", "Level must be a number").isNumeric().escape(),
   body("name", "Name must contain at least 3 characters")
     .isString()
     .trim()
@@ -214,21 +226,57 @@ exports.dogami_create_post = [
     .isString()
     .trim()
     .isIn(dogInfo.breeds)
-    .withMessage(
-      `Dog must be one of the following breeds: ${dogInfo.breeds.join(", ")}`
-    ),
+    .withMessage("Dog must be an accepted Dogami breed")
+    .escape(),
   body("dog_collection")
     .isString()
     .trim()
     .isIn(dogInfo.collection)
-    .withMessage(
-      `Dog must be from one of the following collections: ${dogInfo.collection.join(
-        ", "
-      )}`
-    ),
+    .withMessage("Dog must be an accepted Dogami collection")
+    .escape(),
+  body("status")
+    .isString()
+    .trim()
+    .isIn(dogInfo.dogami_status)
+    .withMessage("Dog must be an accepted Dogami status - 'Puppy' or 'Box'")
+    .escape(),
+  body("rarity")
+    .isString()
+    .trim()
+    .isIn(dogInfo.dogami_rarity)
+    .withMessage("Dog must be an accepted Dogami rarity")
+    .escape(),
+  body("velocity_stats").isObject().withMessage("Stats must be objects"),
+  body("velocity_stats.*.rank")
+    .isString()
+    .trim()
+    .isIn(dogInfo.dogami_rank)
+    .withMessage("Dog skills rank must an accepted Dogami rank")
+    .escape(),
+  body("velocity_stats.*.base_level", "Dog skills base level must be a number")
+    .isNumeric()
+    .escape(),
+  body(
+    "velocity_stats.*.trained_level",
+    "Dog skills trained level must be a number"
+  )
+    .isNumeric()
+    .escape(),
+  body("powers").isArray().withMessage("Dog powers must be an array"),
+  body("powers.*")
+    .isString()
+    .trim()
+    .isIn(dogInfo.powers)
+    .withMessage("Dog powers must be accepted Dogami powers")
+    .escape(),
+
+  // Convert powers array ["Fish", Octopus"] into array of Powers ObjectIds
+  addDogamiMiddleware.transformPowersArray,
 
   // Process request after validation and sanitization.
   asyncHandler(async (req, res, next) => {
+    console.log("Survived the sanitization and validation");
+
     // Extract the validation errors from a request.
     const validationObject = validationResult(req);
 
@@ -259,6 +307,16 @@ exports.dogami_create_post = [
         breed: req.body.breed,
         dog_collection: req.body.dog_collection,
         img_url: dogamiImg.img_url,
+        status: req.body.status,
+        level: req.body.level,
+        rarity: req.body.rarity,
+        powers: req.body.powers,
+        velocity_stats: req.body.velocity_stats,
+        swim_stats: req.body.swim_stats,
+        jump_stats: req.body.jump_stats,
+        balance_stats: req.body.balance_stats,
+        might_stats: req.body.might_stats,
+        instinct_stats: req.body.instinct_stats,
       });
 
       // combined addition of dogami and dogami to owned dogs of user
@@ -312,6 +370,7 @@ async function addDogamiTransaction(dogami, userId) {
       msg: "Dogami successfully added.",
     };
   } catch (error) {
+    console.log(error);
     // Abort the transaction in case of an error
     await session.abortTransaction();
     return {
@@ -326,6 +385,9 @@ async function addDogamiTransaction(dogami, userId) {
 exports.dogami_delete = [
   // verify user (verifyCallback) and expose user object
   passport.authenticate("jwt", { session: false }), // emits user in response
+
+  // Authorise - check that the user in the JWT owns the dog
+  authMiddleware.ownDogami,
 
   // Validate the dogami id
   param("dogamiId", "Invalid dogami id").isMongoId(),
@@ -380,7 +442,7 @@ async function deleteDogamiTransaction(userId, dogamiId) {
     // Alternative is to revert to promise all and apply a 4 or 5 retries logic.
 
     // Delete all track_strats with dogami_id = dogamiId from track_strats collection
-    const deleteTrackStrats = await TrackStrat.deleteMany(
+    const deleteDogStrats = await DogStrat.deleteMany(
       { dogami_id: dogamiId },
       { session }
     ).exec();
@@ -394,15 +456,9 @@ async function deleteDogamiTransaction(userId, dogamiId) {
     ).exec();
 
     // delete dogami from dogami collection
-    const removeDogami = await Dogami.findByIdAndDelete(dogamiId, {
+    await Dogami.findByIdAndDelete(dogamiId, {
       session,
     }).exec();
-
-    // await Promise.all([
-    //   deleteTrackStrats,
-    //   removeDogFromUserOwnedDogs,
-    //   removeDogami,
-    // ]);
 
     // Commit the transaction
     await session.commitTransaction();
@@ -423,3 +479,111 @@ async function deleteDogamiTransaction(userId, dogamiId) {
     session.endSession();
   }
 }
+
+/* ---ADD NEW DOGAMI STRAT--- */
+
+// user in route
+// dogami in route
+// track added into body in client code
+// power1 from form - raw form
+// power2 from form - raw form
+// cons1 from form - raw form
+// time from form
+
+/**
+ * Request dogami/:dogamiId/strat/create
+ *
+ * Params: dogami_id
+ * Body:
+ * {
+ *   track_id: dsds,
+ *   power_1: dsdsds
+ *   power_2: dsdsds
+ *   consumable_1: dsdsds
+ *   strat_best_time: 12.12
+ * }
+ *
+ */
+
+exports.dogami_strat_create_post = [
+  // verify user (verifyCallback) and expose user object
+  passport.authenticate("jwt", { session: false }), // emits user in response
+
+  // Authorise - check that the user in the JWT owns the dog
+  authMiddleware.ownDogami,
+
+  // Validate the dogami id
+  param("dogamiId", "Invalid dogami id").isMongoId(),
+
+  // Validate and sanitize the posted data
+  body("track_id", "Track id must be valid").isMongoId(),
+  body("power_1", "Power must be valid").isMongoId(),
+  body("power_2", "Power must be valid").isMongoId(),
+  body("consumable_1", "Consumable must be valid").isMongoId(),
+  body("strat_best_time", "Best time must be a number").isNumeric().escape(),
+
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const validationObject = validationResult(req);
+
+    if (!validationObject.isEmpty()) {
+      // Errors exist. Tidy and return them.
+      const errorMsg = tidyErrorArray(validationObject);
+      res.status(400).json({ success: false, msg: errorMsg });
+    } else {
+      // Data from form is valid (in this case, duplicate names fine)
+
+      // Create a sanitized and validated dog strat object
+      const dogStrat = new DogStrat({
+        is_private: req.body.is_private,
+        dogami_id: req.params.dogamiId,
+        track_id: req.body.track_id,
+        power_1: req.body.power_1,
+        power_2: req.body.power_2,
+        consumable_1: req.body.consumable_1,
+        strat_best_time: req.body.strat_best_time,
+      });
+
+      await dogStrat.save();
+      res.status(200).json({
+        success: true,
+        msg: "Dogami strategy successfully saved",
+      });
+    }
+  }),
+];
+
+exports.dogami_strat_delete = [
+  // verify user (verifyCallback) and expose user object
+  passport.authenticate("jwt", { session: false }), // emits user in response
+
+  // Authorise - check that the user in the JWT owns the dog
+  authMiddleware.ownDogami,
+
+  // Validate the dogami id
+  param("dogamiId", "Invalid dogami id").isMongoId(),
+  param("stratId", "Invalid strat id").isMongoId(),
+
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const validationObject = validationResult(req);
+
+    console.log("AUTHENT, AUTHORIZE, VALIDATION COMPLETE");
+
+    if (!validationObject.isEmpty()) {
+      // Errors exist. Tidy and return them.
+      const errorMsg = tidyErrorArray(validationObject);
+      res.status(400).json({ success: false, msg: errorMsg });
+    } else {
+      // Data from form is valid (in this case, duplicate names fine)
+
+      const { stratId } = req.params;
+
+      // strats have no dependencies so can be deleted without other collections being affected
+      await DogStrat.findByIdAndDelete(stratId).exec();
+      res.status(200).json({ success: true, msg: "Strategy deleted" });
+    }
+  }),
+];

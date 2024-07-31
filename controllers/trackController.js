@@ -5,7 +5,7 @@ const Track = require("../models/trackModel");
 // short form, applying try {} catch(err)
 const asyncHandler = require("express-async-handler");
 
-/* ---REQUEST TAILORED TO DATA NEEDED BY FRONTEND DOGAMI TRACK PAGE --- */
+/* ---REQUEST FOR SINGLE TRACK DETAIL--- */
 
 exports.tracks_get = [
   // passport middleware applies verifyCallback

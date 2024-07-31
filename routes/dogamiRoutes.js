@@ -7,13 +7,7 @@ const dogami_controller = require("../controllers/dogamiController");
 
 // specific order to ensure correct route kicks in
 
-// Create a new Dogami.
-// router.post("/dogami/create", dogami_controller.dogami_create_post);
-
-// Delete a single Dogami.
-// router.delete("/dogami/:id", dogami_controller.dogami_delete);
-
-// Update a single Dogami.
+// Update a single Dogami - not needed as yet while all dogami info is from proxy.dogami
 // Best practice...
 // Post used for partial or non-idempotent (e.g. add) updates.
 // Put used for complete and idempotent replacements.
@@ -34,7 +28,19 @@ router.get(
 
 /* --- API ROUTES--- */
 
-// GET request for all strats for a specific Dogami
+// POST request to add a new dog strat for a specific Dogami
+router.post(
+  "/:dogamiId/strat/create",
+  dogami_controller.dogami_strat_create_post
+);
+
+// DELETE request to delete a dog strat
+router.delete(
+  "/:dogamiId/strats/:stratId",
+  dogami_controller.dogami_strat_delete
+);
+
+// GET request for all dog strats for a specific Dogami
 router.get("/:dogamiId/strats", dogami_controller.dogami_strat_list);
 
 // GET request for a specific Dogami (catering for query parameters).
