@@ -29,3 +29,28 @@ exports.tracks_get = [
       });
   }),
 ];
+
+exports.tracks_list = [
+  // passport middleware applies verifyCallback
+  passport.authenticate("jwt", { session: false }), // emits user in response
+
+  // No authorisation needed to collect list of tracks
+
+  // Collect and return full list of tracks
+  asyncHandler(async (req, res, next) => {
+    const tracks = await Track.find().exec();
+
+    if (!tracks) {
+      return res.status(401).json({
+        success: false,
+        msg: "could not find any tracks",
+      });
+    }
+
+    const response = {
+      success: true,
+      data: tracks,
+    };
+    res.status(200).json(response);
+  }),
+];
