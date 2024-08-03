@@ -6,6 +6,9 @@ var router = express.Router();
 const dogami_img_controller = require("../controllers/dogamiImgController");
 
 // POST an array of data
-router.post("/add-array", dogami_img_controller.dogami_add_array);
+// THIS IS DISABLED AS IT WAS A ONE-OFF
+// router.post("/add-array", dogami_img_controller.dogami_add_array);
+
+router.get("/:dogamiId", dogami_img_controller.dogami_img_detail);
 
 module.exports = router;

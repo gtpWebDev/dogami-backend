@@ -8,14 +8,14 @@ const dogamiRouter = require("./dogamiRoutes");
 const trackRouter = require("./trackRoutes");
 const powerRouter = require("./powerRoutes");
 const consumableRouter = require("./consumableRoutes");
-// const dogamiImgRouter = require("./dogamiImgRoutes"); // one-off comment out
+const dogamiImgRouter = require("./dogamiImgRoutes");
 
 router.use("/user", userRouter);
 router.use("/dogamis", dogamiRouter);
 router.use("/tracks", trackRouter);
 router.use("/powers", powerRouter);
 router.use("/consumables", consumableRouter);
-// router.use("/dogami-img", dogamiImgRouter); // one-off comment out
+router.use("/dogami-images", dogamiImgRouter);
 
 router.get("/", async (req, res, next) => {
   res.status(200).json({ msg: "test - backend service live" });

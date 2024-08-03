@@ -22,7 +22,7 @@ const breeds = [
   "Toy Poodle",
 ];
 
-const dogami_status = ["Puppy", "Box"];
+const dogami_status = ["Puppy"];
 
 const dogami_rarity = ["Diamond", "Gold", "Silver", "Bronze"];
 

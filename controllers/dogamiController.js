@@ -212,6 +212,10 @@ exports.dogami_create_post = [
   // verify user (verifyCallback) and expose user object
   passport.authenticate("jwt", { session: false }), // emits user in response
 
+  // Check whether the dog is status box ahead of other validation
+  // to give tailored msg
+  addDogamiMiddleware.isNotBox,
+
   // Validate and sanitize the posted data
   body("dogami_official_id", "Official dogami id must be a number")
     .isNumeric()
@@ -238,7 +242,7 @@ exports.dogami_create_post = [
     .isString()
     .trim()
     .isIn(dogInfo.dogami_status)
-    .withMessage("Dog must be an accepted Dogami status - 'Puppy' or 'Box'")
+    .withMessage("The dog must be a puppy, it cannot be a box.")
     .escape(),
   body("rarity")
     .isString()
@@ -269,6 +273,9 @@ exports.dogami_create_post = [
     .isIn(dogInfo.powers)
     .withMessage("Dog powers must be accepted Dogami powers")
     .escape(),
+
+  // Check whether the dog id has already been added for this user
+  addDogamiMiddleware.isDuplicateDog,
 
   // Convert powers array ["Fish", Octopus"] into array of Powers ObjectIds
   addDogamiMiddleware.transformPowersArray,
