@@ -15,8 +15,7 @@ exports.consumables_list = [
 
   // Collect and return full list of consumables
   asyncHandler(async (req, res, next) => {
-    const consumables = await Consumable.find().exec();
-
+    const consumables = await Consumable.find().populate("skills").exec();
     if (!consumables) {
       return res.status(401).json({
         success: false,

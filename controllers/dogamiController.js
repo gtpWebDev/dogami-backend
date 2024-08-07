@@ -175,7 +175,6 @@ exports.dogami_strat_list = [
   asyncHandler(async (req, res, next) => {
     // Extract the validation errors from the filters.
     const validationObject = validationResult(req);
-
     if (!validationObject.isEmpty()) {
       // Errors exist. Tidy and return them.
       const errorMsg = tidyErrorArray(validationObject);
@@ -187,9 +186,27 @@ exports.dogami_strat_list = [
       })
         .populate("dogami_id")
         .populate("track_id")
-        .populate("power_1")
-        .populate("power_2")
-        .populate("consumable_1")
+        .populate({
+          path: "power_1",
+          populate: {
+            path: "skills",
+            model: "Skill",
+          },
+        })
+        .populate({
+          path: "power_2",
+          populate: {
+            path: "skills",
+            model: "Skill",
+          },
+        })
+        .populate({
+          path: "consumable_1",
+          populate: {
+            path: "skills",
+            model: "Skill",
+          },
+        })
         .then((strategy) => {
           if (!strategy) {
             return res.status(401).json({

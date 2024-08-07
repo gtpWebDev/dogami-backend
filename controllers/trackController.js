@@ -16,6 +16,10 @@ exports.tracks_get = [
   // Collect and return the dogami and track information
   asyncHandler(async (req, res, next) => {
     Track.findById(req.params.trackId)
+      .populate({
+        path: "draw_array.skill",
+        model: "Skill",
+      })
       .then((track) => {
         if (!track) {
           return res
