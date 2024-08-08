@@ -40,6 +40,13 @@ router.delete(
   dogami_controller.dogami_strat_delete
 );
 
+// Frontened approach is to submit whole strat, so using post
+// PUT preferred for part updates, POST preferred for full updates
+router.post(
+  "/:dogamiId/strats/:stratId",
+  dogami_controller.dogami_strat_update_post
+);
+
 // GET request for all dog strats for a specific Dogami
 router.get("/:dogamiId/strats", dogami_controller.dogami_strat_list);
 

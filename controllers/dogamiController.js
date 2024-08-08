@@ -8,6 +8,7 @@ const Dogami = require("../models/dogamiModel");
 const DogStrat = require("../models/dogStratModel");
 const Track = require("../models/trackModel");
 const DogamiImage = require("../models/dogamiImgModel");
+
 const Power = require("../models/powerModel");
 const Consumable = require("../models/consumableModel");
 
@@ -608,6 +609,55 @@ exports.dogami_strat_delete = [
       // strats have no dependencies so can be deleted without other collections being affected
       await DogStrat.findByIdAndDelete(stratId).exec();
       res.status(200).json({ success: true, msg: "Strategy deleted" });
+    }
+  }),
+];
+
+exports.dogami_strat_update_post = [
+  // verify user (verifyCallback) and expose user object
+  passport.authenticate("jwt", { session: false }), // emits user in response
+
+  // Authorise - check that the user in the JWT owns the dog
+  authMiddleware.ownDogami,
+
+  // Validate the dogami id
+  param("dogamiId", "Invalid dogami id").isMongoId(),
+
+  // Validate the dogami id
+  param("stratId", "Invalid strat id").isMongoId(),
+
+  // Validate and sanitize the update data
+  body("track_id", "Track id must be valid").isMongoId(),
+  body("power_1", "Power must be valid").isMongoId(),
+  body("power_2", "Power must be valid").isMongoId(),
+  body("consumable_1", "Consumable must be valid").isMongoId(),
+  body("strat_best_time", "Best time must be a number").isNumeric().escape(),
+
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const validationObject = validationResult(req);
+
+    if (!validationObject.isEmpty()) {
+      // Errors exist. Tidy and return them.
+      const errorMsg = tidyErrorArray(validationObject);
+      res.status(400).json({ success: false, msg: errorMsg });
+    } else {
+      // not providing the ability to update dogami_id or track_id
+      await DogStrat.findByIdAndUpdate(req.params.stratId, {
+        $set: {
+          is_private: req.body.is_private,
+          power_1: req.body.power_1,
+          power_2: req.body.power_2,
+          consumable_1: req.body.consumable_1,
+          strat_best_time: req.body.strat_best_time,
+        },
+      });
+
+      res.status(200).json({
+        success: true,
+        msg: "Dogami strategy successfully updated",
+      });
     }
   }),
 ];
