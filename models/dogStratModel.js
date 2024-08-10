@@ -15,9 +15,16 @@ const DogStratSchema = new Schema(
   { collection: "dog_strats" }
 );
 
-// Virtual for track strat URL - may be needed?
-// DogamiSchema.virtual("url").get(function () {
-//   return `/track/${this._id}`;
-// });
+/**
+ * NOTE THIS WILL ADD INDEXES WHEN APPLICATION CONNECTS TO DATABASE
+ * THIS WOULD HAPPEN WITH EACH OUTAGE??
+ * LOOK AT MIGRATION TOOLS SUCH AS migrate-mongo TO BETTER CONTROL WHEN
+ * INDEXES ARE CREATED - E.G DEPLOYMENT, VERSIONING
+ */
+
+// Optimises filter by dogami_id, dogami_page_get
+DogStratSchema.index({ dogami_id: 1 });
+// Optimises sort by track_id and strat_best_time, dogami_page_get
+DogStratSchema.index({ track_id: 1, strat_best_time: 1 });
 
 module.exports = mongoose.connection.model("DogStrat", DogStratSchema);
