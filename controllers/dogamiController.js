@@ -3,6 +3,8 @@ const passport = require("passport");
 // shouldn't have to define this?
 const mongoose = require("mongoose");
 
+const dogamiService = require("../services/dogamiService");
+
 const User = require("../models/userModel");
 const Dogami = require("../models/dogamiModel");
 const DogStrat = require("../models/dogStratModel");
@@ -105,128 +107,15 @@ exports.dogami_page_get = [
       Dogami.findById(req.params.dogamiId).exec(),
       /**
        * Get minimum time for each track id, for the relevant dogami
-       * Because also need to bring in the other document information
-       * for the minimum strat, have used the following approach:
-       * - Filter by dogamiId
-       *
-       * - Sort by track_id and strat_best_time
-       * - Group by track_id, getting the first item
-       * (Sort, group, first allows retaining the other document values whereas group, min, lookup doesn't)
-       *
-       * Note, this approach requires an index on:
-       * - dogami_id to optimise filter
-       * - track_id and strat_best_time to optimise sort
-       *
+       * This is complex because I need to also bring in a lot of drilldown
+       * information:
+       * - the draw array for each track
+       * - the skills array, populated for all of power_1, power2 and
+       *   consumable_1
        */
-
-      // Also bring in other information for the strat related to the minimum time
-      DogStrat.aggregate([
-        // Filter by dogamiId
-        {
-          $match: {
-            dogami_id: dogamiObjectId,
-          },
-        },
-
-        // sort and group to collect the minimum strat_best_time
-        {
-          $sort: {
-            track_id: 1,
-            strat_best_time: 1,
-          },
-        },
-        {
-          $group: {
-            _id: "$track_id", // Group by track_id
-            doc: { $first: "$$ROOT" }, // seems to collect all fields of the document
-          },
-        },
-
-        // Replaces _id and the doc object with just the doc object - effectively
-        // the whole strat document corresponding to each minimum
-        {
-          $replaceRoot: { newRoot: "$doc" },
-        },
-
-        // Using lookup to populate("track_id") to get name, etc.
-        {
-          $lookup: {
-            from: "tracks", // Collection name
-            localField: "track_id",
-            foreignField: "_id",
-            as: "trackDetails",
-          },
-        },
-
-        // Deconstruct the array - replace single-item array with object
-        { $unwind: "$trackDetails" },
-
-        // Deconstructs the draw_array - splits strat with track with 8 array elements into 8 strats!
-        // an artificial stage to give access to allow a lookup on the contents of the draw array
-        { $unwind: "$trackDetails.draw_array" },
-
-        // Lookup the skills collection to get skill details for each skill_id in the draw_array.
-        {
-          $lookup: {
-            from: "skills",
-            localField: "trackDetails.draw_array.skill",
-            foreignField: "_id",
-            as: "trackDetails.draw_array.skillDetails",
-          },
-        },
-
-        // Deconstructs the skillDetails array - replace single-item array with object
-        { $unwind: "$trackDetails.draw_array.skillDetails" },
-
-        // bring the draw_array back to an array
-        {
-          $group: {
-            _id: "$track_id",
-            power_1: { $first: "$power_1" },
-            power_2: { $first: "$power_2" },
-            consumable_1: { $first: "$consumable_1" },
-            is_private: { $first: "$is_private" },
-            strat_best_time: { $first: "$strat_best_time" },
-            track_draw_array: { $push: "$trackDetails.draw_array" },
-            track_name: { $first: "$trackDetails.name" },
-            track_trial: { $first: "$trackDetails.trial_track" },
-          },
-        },
-
-        // final organisation of data
-        {
-          $project: {
-            _id: 0, // this is generated unique to the projection, exclude
-            track_id: "$_id",
-            is_private: 1,
-            strat_best_time: 1,
-            power_1: 1,
-            power_2: 1,
-            consumable_1: 1,
-            trackDetails: {
-              name: "$track_name",
-              track_trial: "$track_trial",
-
-              draw_array: {
-                $map: {
-                  input: "$track_draw_array",
-                  as: "item",
-                  in: {
-                    width: "$$item.width",
-                    skill: {
-                      skill_id: "$$item.skill",
-                      name: "$$item.skillDetails.name",
-                      colour: "$$item.skillDetails.colour",
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-
-        // probably still need to lookup powers and consumables!
-      ]).exec(),
+      DogStrat.aggregate(
+        dogamiService.bestStrategyByTrackPipeline(dogamiObjectId)
+      ).exec(),
     ]);
 
     const response = {
