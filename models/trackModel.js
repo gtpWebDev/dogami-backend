@@ -24,6 +24,10 @@ const TrackSchema = new Schema(
         width: { type: Number, required: true },
       },
     ],
+    // skill_sequence exists purely to aid a filter. e.g. C2 is "YBRGYGBY"
+    // when they add combo obstacles: "YBR[GB]YRB"
+    // chars could be limited but will be controlled by admin
+    obstacle_sequence: { type: String, required: true, maxLength: 50 },
   },
   { collection: "tracks" }
 );
