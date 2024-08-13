@@ -105,14 +105,7 @@ exports.dogami_page_get = [
     const [dogami, bestDogStratsForDogami] = await Promise.all([
       // full dogami info
       Dogami.findById(req.params.dogamiId).exec(),
-      /**
-       * Get minimum time for each track id, for the relevant dogami
-       * This is complex because I need to also bring in a lot of drilldown
-       * information:
-       * - the draw array for each track
-       * - the skills array, populated for all of power_1, power2 and
-       *   consumable_1
-       */
+      // see notes in dogamiService - complicated!
       DogStrat.aggregate(
         dogamiService.bestStrategyByTrackPipeline(dogamiObjectId)
       ).exec(),

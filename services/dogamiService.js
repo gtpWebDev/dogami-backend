@@ -85,6 +85,7 @@ const addTrackInformation = [
       is_private: { $first: "$is_private" },
       strat_best_time: { $first: "$strat_best_time" },
       track_draw_array: { $push: "$trackDetails.draw_array" },
+      track_obstacle_sequence: { $first: "$trackDetails.obstacle_sequence" },
       track_name: { $first: "$trackDetails.name" },
       track_trial: { $first: "$trackDetails.trial_track" },
     },
@@ -102,6 +103,7 @@ const addTrackInformation = [
       trackDetails: {
         name: "$track_name",
         track_trial: "$track_trial",
+        obstacle_sequence: "$track_obstacle_sequence",
         draw_array: {
           $map: {
             input: "$track_draw_array",
@@ -230,6 +232,15 @@ const addConsumableInformation = (inputProp) => {
 
   return pipeline;
 };
+
+/**
+ * Get minimum time for each track id, for the relevant dogami
+ * This is complex because I need to also bring in a lot of drilldown
+ * information:
+ * - the draw array for each track
+ * - the skills array, populated for all of power_1, power2 and
+ *   consumable_1
+ */
 
 exports.bestStrategyByTrackPipeline = (dogamiObjId) => {
   const pipeline = [
