@@ -10,6 +10,7 @@ const powerRouter = require("./powerRoutes");
 const consumableRouter = require("./consumableRoutes");
 const skillRouter = require("./skillRoutes");
 const dogamiImgRouter = require("./dogamiImgRoutes");
+const dogamiOfficialApiRouter = require("./dogamiOfficialApiRoutes");
 
 router.use("/user", userRouter);
 router.use("/dogamis", dogamiRouter);
@@ -18,6 +19,7 @@ router.use("/powers", powerRouter);
 router.use("/consumables", consumableRouter);
 router.use("/skills", skillRouter);
 router.use("/dogami-images", dogamiImgRouter);
+router.use("/dogami-official-api", dogamiOfficialApiRouter);
 
 router.get("/", async (req, res, next) => {
   res.status(200).json({ msg: "test - backend service live" });

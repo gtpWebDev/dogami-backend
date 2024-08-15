@@ -8,6 +8,7 @@
     "serverstart": "DEBUG=projectname:* npm run devstart"
   },
   "dependencies": {
+    "axios": "^1.7.4",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
