@@ -19,6 +19,7 @@
 const populateTrackData = (skills) => {
   const trackData = [
     {
+      display_order: 1,
       name: "C1",
       trial_track: true,
       draw_array: [
@@ -33,6 +34,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yryoby",
     },
     {
+      display_order: 2,
       name: "C2",
       trial_track: true,
       draw_array: [
@@ -48,6 +50,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybrgygby",
     },
     {
+      display_order: 3,
       name: "C3",
       trial_track: true,
       draw_array: [
@@ -63,6 +66,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yrbyry",
     },
     {
+      display_order: 4,
       name: "C4",
       trial_track: true,
       draw_array: [
@@ -78,6 +82,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybypyrby",
     },
     {
+      display_order: 5,
       name: "C5",
       trial_track: true,
       draw_array: [
@@ -92,6 +97,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yrgoyoy",
     },
     {
+      display_order: 6,
       name: "C6",
       trial_track: true,
       draw_array: [
@@ -109,6 +115,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yrororoyoy",
     },
     {
+      display_order: 7,
       name: "C7",
       trial_track: true,
       draw_array: [
@@ -127,6 +134,7 @@ const populateTrackData = (skills) => {
     },
 
     {
+      display_order: 8,
       name: "C8",
       trial_track: true,
       draw_array: [
@@ -150,12 +158,14 @@ const populateTrackData = (skills) => {
     // 5-Purple
     // 6-None
     {
+      display_order: 9,
       name: "C9",
       trial_track: true,
       draw_array: [{ skill: skills[0], width: 100 }],
       obstacle_sequence: "zzzzz",
     },
     {
+      display_order: 10,
       name: "C10",
       trial_track: true,
       draw_array: [
@@ -173,6 +183,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yrypyrypy",
     },
     {
+      display_order: 11,
       name: "C11",
       trial_track: true,
       draw_array: [
@@ -190,6 +201,7 @@ const populateTrackData = (skills) => {
     },
 
     {
+      display_order: 12,
       name: "C12",
       trial_track: true,
       draw_array: [
@@ -207,6 +219,7 @@ const populateTrackData = (skills) => {
     },
 
     {
+      display_order: 13,
       name: "C13",
       trial_track: true,
       draw_array: [
@@ -224,6 +237,7 @@ const populateTrackData = (skills) => {
     },
 
     {
+      display_order: 14,
       name: "C14",
       trial_track: true,
       draw_array: [
@@ -242,6 +256,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yoyrgoroygy",
     },
     {
+      display_order: 15,
       name: "C15",
       trial_track: true,
       draw_array: [
@@ -260,6 +275,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yrbogrobgy",
     },
     {
+      display_order: 16,
       name: "C16",
       trial_track: true,
       draw_array: [
@@ -277,6 +293,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ypyobpoby",
     },
     {
+      display_order: 17,
       name: "C17",
       trial_track: true,
       draw_array: [
@@ -294,6 +311,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybygpbgpy",
     },
     {
+      display_order: 18,
       name: "C18",
       trial_track: true,
       draw_array: [
@@ -312,6 +330,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yoygypogpy",
     },
     {
+      display_order: 19,
       name: "C19",
       trial_track: true,
       draw_array: [
@@ -329,6 +348,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ygpobgobpy",
     },
     {
+      display_order: 20,
       name: "C20",
       trial_track: true,
       draw_array: [
@@ -346,6 +366,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybrypbypry",
     },
     {
+      display_order: 21,
       name: "C21",
       trial_track: true,
       draw_array: [
@@ -362,6 +383,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yrpoyorpy",
     },
     {
+      display_order: 22,
       name: "C22",
       trial_track: true,
       draw_array: [
@@ -379,6 +401,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybrpobproy",
     },
     {
+      display_order: 23,
       name: "C23",
       trial_track: true,
       draw_array: [
@@ -398,6 +421,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ygygrpyrypgy",
     },
     {
+      display_order: 24,
       name: "C24",
       trial_track: true,
       draw_array: [
@@ -415,6 +439,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybrgprgbpy",
     },
     {
+      display_order: 25,
       name: "C25",
       trial_track: true,
       draw_array: [
@@ -433,6 +458,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yorpgrpogoy",
     },
     {
+      display_order: 26,
       name: "D1",
       trial_track: true,
       draw_array: [
@@ -446,6 +472,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybrbgy",
     },
     {
+      display_order: 27,
       name: "D2",
       trial_track: true,
       draw_array: [
@@ -463,6 +490,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yprgpgrgpy",
     },
     {
+      display_order: 28,
       name: "D3",
       trial_track: true,
       draw_array: [
@@ -480,6 +508,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ypryororpy",
     },
     {
+      display_order: 29,
       name: "D4",
       trial_track: true,
       draw_array: [
@@ -495,14 +524,8 @@ const populateTrackData = (skills) => {
       ],
       obstacle_sequence: "ygyoyoyoy",
     },
-    // 0-Yellow
-    // 1-Blue
-    // 2-Orange
-    // 3-Green
-    // 4-Red
-    // 5-Purple
-    // 6-None
     {
+      display_order: 30,
       name: "D5",
       trial_track: true,
       draw_array: [
@@ -520,6 +543,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ygrgboypgy",
     },
     {
+      display_order: 31,
       name: "D6",
       trial_track: true,
       draw_array: [
@@ -536,6 +560,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybygrpoby",
     },
     {
+      display_order: 32,
       name: "D7",
       trial_track: true,
       draw_array: [
@@ -552,6 +577,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yrororpby",
     },
     {
+      display_order: 33,
       name: "D8",
       trial_track: true,
       draw_array: [
@@ -565,27 +591,15 @@ const populateTrackData = (skills) => {
       ],
       obstacle_sequence: "ypygyry",
     },
-    // 0-Yellow
-    // 1-Blue
-    // 2-Orange
-    // 3-Green
-    // 4-Red
-    // 5-Purple
-    // 6-None
     {
+      display_order: 34,
       name: "D9",
       trial_track: true,
       draw_array: [{ skill: skills[0], width: 100 }],
       obstacle_sequence: "zzzzz",
     },
-    // 0-Yellow
-    // 1-Blue
-    // 2-Orange
-    // 3-Green
-    // 4-Red
-    // 5-Purple
-    // 6-None
     {
+      display_order: 35,
       name: "D10",
       trial_track: true,
       draw_array: [
@@ -600,6 +614,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ygrpgoy",
     },
     {
+      display_order: 36,
       name: "CLIMBING",
       trial_track: true,
       draw_array: [
@@ -618,6 +633,7 @@ const populateTrackData = (skills) => {
     },
 
     {
+      display_order: 37,
       name: "DIVING",
       trial_track: true,
       draw_array: [
@@ -634,6 +650,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "ybrgbrgby",
     },
     {
+      display_order: 38,
       name: "RUGBY",
       trial_track: true,
       draw_array: [
@@ -650,6 +667,7 @@ const populateTrackData = (skills) => {
       obstacle_sequence: "yryryryoy",
     },
     {
+      display_order: 39,
       name: "TRIATHLON",
       trial_track: true,
       draw_array: [

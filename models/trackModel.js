@@ -16,6 +16,7 @@ const Schema = mongoose.Schema;
 
 const TrackSchema = new Schema(
   {
+    display_order: { type: Number, required: true }, // assists dropdown list being ordered as required
     name: { type: String, required: true, maxLength: 20 }, // e.g. "D5"
     trial_track: { type: Boolean, required: true },
     draw_array: [

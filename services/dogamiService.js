@@ -85,6 +85,7 @@ const addTrackInformation = [
       is_private: { $first: "$is_private" },
       strat_best_time: { $first: "$strat_best_time" },
       track_draw_array: { $push: "$trackDetails.draw_array" },
+      track_display_order: { $first: "$trackDetails.display_order" },
       track_obstacle_sequence: { $first: "$trackDetails.obstacle_sequence" },
       track_name: { $first: "$trackDetails.name" },
       track_trial: { $first: "$trackDetails.trial_track" },
@@ -102,6 +103,7 @@ const addTrackInformation = [
       consumable_1: 1,
       trackDetails: {
         name: "$track_name",
+        display_order: "$track_display_order",
         track_trial: "$track_trial",
         obstacle_sequence: "$track_obstacle_sequence",
         draw_array: {
