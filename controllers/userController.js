@@ -151,3 +151,13 @@ exports.dashboard_get = [
       });
   }),
 ];
+
+// request for the username relating to the client-stored JWT
+// note could decode the payload on the client side, prefer this
+exports.user_get = [
+  passport.authenticate("jwt", { session: false }), // emits user in response
+
+  asyncHandler(async (req, res, next) => {
+    res.status(200).json({ success: true, data: req.user.username });
+  }),
+];

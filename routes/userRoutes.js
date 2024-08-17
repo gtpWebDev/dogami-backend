@@ -26,5 +26,8 @@ router.post("/login", user_controller.login_post);
 // GET request tailored to the needs of the frontend user dashboard
 router.get("/frontend-user-dashboard", user_controller.dashboard_get);
 
+// GET request to collect the username relating to a JWT, nothing else
+router.get("/current-user", user_controller.user_get);
+
 // creates and a modular, mountable route handler
 module.exports = router;
